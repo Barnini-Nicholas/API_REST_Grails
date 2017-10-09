@@ -1,5 +1,7 @@
 package tp
 
+import grails.converters.JSON
+
 class BootStrap {
 
     def init = { servletContext ->
@@ -14,6 +16,7 @@ class BootStrap {
         b1.addToLivres(l1)
         b1.addToLivres(l2)
         b1.save(flush : true)
+
 
     }
     def destroy = {
