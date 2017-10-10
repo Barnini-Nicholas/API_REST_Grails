@@ -9,6 +9,9 @@ class UrlMappings {
             }
         }
 
+        "/API/bibliotheque/${id}/livre/${idLivre}"(controller: "API", action: "bibliotheque")
+        "/API/livre/${id}/bibliotheque/${idBibliotheque}"(controller: "API", action: "livre")
+
         "/"(view:"/index")
         "500"(view:'/error')
         "404"(view:'/notFound')
