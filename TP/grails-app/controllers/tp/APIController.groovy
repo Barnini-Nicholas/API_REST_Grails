@@ -34,6 +34,7 @@ class APIController {
 
             case "GET": // Récupérer
 
+                println(params)
                 def bibli = Bibliotheque.findById(params.id)
                 if (!bibli) {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
@@ -199,6 +200,50 @@ class APIController {
             default:
 
                 break;
+        }
+    }
+
+    def listLivreDansUneBibliotheque(){
+
+        switch (request.getMethod()) {
+            case "GET":
+
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
+                } else {
+
+                    Set<Livre> listLivre = bibli.livres
+
+                    withFormat {
+                        json { render listLivre as JSON }
+                        xml { render listLivre as XML }
+                    }
+                }
+
+                break
+
+            case "DELETE":
+
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
+                } else {
+
+                    def livres = Livre.findAllByBibliotheque(bibli)
+                    livres.each {livre ->
+                        bibli.removeFromLivres(livre)
+                        livre.delete(flush: true)
+                    }
+
+                    render(status: 201, text: "Les livres ont été supprimés de la bibliothéque n°${params.id} avec succés.") as JSON
+                }
+
+                break
+
+            default:
+                render(status: 404, text: "Uniquement GET et DELETE supporté pour \"API/bibliotheque/<id>/livres.\"") as JSON
+                break
         }
     }
 
