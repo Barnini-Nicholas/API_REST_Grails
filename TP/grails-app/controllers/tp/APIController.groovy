@@ -99,7 +99,7 @@ class APIController {
         //break;
 
             default:
-
+                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
                 break;
         }
     }
@@ -198,7 +198,7 @@ class APIController {
         //break;
 
             default:
-
+                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
                 break;
         }
     }
