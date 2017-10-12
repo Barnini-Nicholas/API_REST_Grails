@@ -24,7 +24,7 @@ class APIController {
 
                 def bibliInstance = new Bibliotheque(params)
                 if (bibliInstance.save(flush: true)) {
-                    render(status: 201, text: "La bibliotheque(${bibliInstance.id}) a été créé.")
+                    render(status: 201, text: "${bibliInstance.id}")
                 } else {
                     response.status = 400
                 }
@@ -120,7 +120,7 @@ class APIController {
 
                 def livreInstance = new Livre(params)
                 if (livreInstance.save(flush: true)) {
-                    render(status: 201, text: "Le livre (${livreInstance.id}) a été créé.")
+                    render(status: 201, text: "${livreInstance.id}")
                 } else {
                     response.status = 400
                 }
