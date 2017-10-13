@@ -10,9 +10,13 @@ class UrlMappings {
         }
 
         "/API/bibliotheque/${id}/livre/${idLivre}"(controller: "API", action: "UnLivreDansUneBibliotheque")
-        //"/API/livre/${id}/bibliotheque/${idBibliotheque}"(controller: "API", action: "livre")
+        "/API/bibliotheque/${id}/livre/${idLivre}/"(controller: "API", action: "UnLivreDansUneBibliotheque")
 
         "/API/bibliotheque/${id}/livres"(controller : "API", action : "listLivreDansUneBibliotheque")
+        "/API/bibliotheque/${id}/livres/"(controller : "API", action : "listLivreDansUneBibliotheque")
+
+        "/API/bibliotheque/${id}/livre"(controller : "API", action : "erreurPartieURLManquante")
+        "/API/bibliotheque/${id}/livre/"(controller : "API", action : "erreurPartieURLManquante")
 
         "/"(view:"/index")
         "500"(view:'/error')

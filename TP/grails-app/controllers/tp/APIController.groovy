@@ -191,7 +191,8 @@ class APIController {
                 if (!livre) {
                     render(status: 404, text: "L'id de ce livre n'existe pas.") as JSON
                 } else {
-                    if (livre.delete(flush: true))
+                    livre.delete(flush: true)
+                    if (livre.save(flush: true))
                         render(status: 201, text: "Le livre (${livre.id}) a été supprimé.") as JSON
                     else
                         render(status: 404, text: "Le livre (${livre.id}) n'a pas pu être supprimé.") as JSON
@@ -256,11 +257,10 @@ class APIController {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
 
-                    Livre li = new Livre(params)
-                    //li.dateParution=
+                    Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
                     bibli.addToLivres(li)
-                    if(!bibli.save())
+                    if(bibli.save(flush : true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
                         render(status: 201, text: "Le livre n°${li.id} a été créé avec succés.") as JSON
@@ -334,6 +334,15 @@ class APIController {
                 break;
 
         }
+
+    }
+
+    def erreurPartieURLManquante (){
+        render(status: 404, text: "L'URL indiqué est mauvaise. Vous pouvez utiliser : \n" +
+                " - <racine>/API/bibliotheque/<idBibli>/livre/<idLivre>\n" +
+                " - <racine>/API/bibliotheque/<idBibli>/livres\n" +
+                " - <racine>/API/bibliotheque/<idBibli>\n" +
+                " - <racine>/API/livre/<idLivre>") as JSON
 
     }
 
