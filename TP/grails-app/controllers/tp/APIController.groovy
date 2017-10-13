@@ -30,7 +30,7 @@ class APIController {
                 if (bibliInstance.save(flush: true)) {
                     render(status: 201, text: "${bibliInstance.id}")
                 } else {
-                    response.status = 400
+                    response.status = 404
                 }
 
 
@@ -75,7 +75,7 @@ class APIController {
                     render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
                     if (bibli.save(flush: true)) {
-                        render(status: 201, text: "La bibliotheque (${bibli.id}) a été modifié.")
+                        render(status: 200, text: "La bibliotheque (${bibli.id}) a été modifié.")
                     } else {
                         response.status = 400
                     }
@@ -88,11 +88,12 @@ class APIController {
                 if (!bibli) {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
+                    def IDdef = bibli.id
                     bibli.delete()
                     if (bibli.save(flush: true))
-                        render(status: 201, text: "La bibliotheque (${bibli.id}) a été supprimé.") as JSON
+                        render(status: 200, text: "La bibliotheque ($IDdef) a été supprimé.") as JSON
                     else
-                        render(status: 404, text: "La bibliotheque (${bibli.id}) n'a pas pu être supprimé.") as JSON
+                        render(status: 404, text: "La bibliotheque ($IDdef) n'a pas pu être supprimé.") as JSON
                 }
 
                 break;
@@ -115,22 +116,32 @@ class APIController {
 
             case "POST": // Créer
 
-                // FAIRE LA DATE
+
                 if (params.nom == null || params.nom == "") {
                     render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.ISBN == null || params.ISBN == "") {
                     render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.auteur == null || params.auteur == "") {
                     render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.dateParution == null || params.dateParution == "") {
+                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.bibliID == null || params.bibliID == "") {
+                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
                 }
 
-                def livreInstance = new Livre(params)
-                if (livreInstance.save(flush: true)) {
-                    render(status: 201, text: "${livreInstance.id}")
+                def bibli = Bibliotheque.findById(params.bibliID)
+                if (bibli == null) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
-                    response.status = 400
-                }
 
+                    Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
+
+                    bibli.addToLivres(li)
+                    if(bibli.save(flush : true) == null)
+                        render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
+                    else
+                        render(status: 201, text: "${li.id}") as JSON
+                }
 
                 break;
 
@@ -156,8 +167,6 @@ class APIController {
 
                 boolean hasBeenModified = false
 
-                // FAIRE LA DATE
-
                 if (!(params.nom == null || params.nom == "")) {
                     livre.nom = params.nom
                     hasBeenModified = true
@@ -173,11 +182,16 @@ class APIController {
                     hasBeenModified = true
                 }
 
+                if (!(params.dateParution == null || params.dateParution == "")) {
+                    livre.dateParution = APIService.getDateFromStringSeri(params.dateParution)
+                    hasBeenModified = true
+                }
+
                 if (!hasBeenModified) { // rien modifier
                     render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
                     if (livre.save(flush: true)) {
-                        render(status: 201, text: "Le livre (${livre.id}) a été modifié.")
+                        render(status: 200, text: "Le livre (${livre.id}) a été modifié.")
                     } else {
                         response.status = 400
                     }
@@ -191,11 +205,12 @@ class APIController {
                 if (!livre) {
                     render(status: 404, text: "L'id de ce livre n'existe pas.") as JSON
                 } else {
+                    def livreIDdef = livre.id
                     livre.delete(flush: true)
                     if (livre.save(flush: true))
-                        render(status: 201, text: "Le livre (${livre.id}) a été supprimé.") as JSON
+                        render(status: 200, text: "Le livre ($livreIDdef) a été supprimé.") as JSON
                     else
-                        render(status: 404, text: "Le livre (${livre.id}) n'a pas pu être supprimé.") as JSON
+                        render(status: 404, text: "Le livre ($livreIDdef) n'a pas pu être supprimé.") as JSON
                 }
 
                 break;
@@ -245,7 +260,7 @@ class APIController {
                         livre.delete(flush: true)
                     }
 
-                    render(status: 201, text: "Les livres ont été supprimés de la bibliothéque n°${params.id} avec succés.") as JSON
+                    render(status: 200, text: "Les livres ont été supprimés de la bibliothéque n°${params.id} avec succés.") as JSON
                 }
 
                 break
@@ -256,6 +271,16 @@ class APIController {
                 if (!bibli) {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
+
+                    if (params.nom == null || params.nom == "") {
+                        render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                    } else if (params.ISBN == null || params.ISBN == "") {
+                        render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                    } else if (params.auteur == null || params.auteur == "") {
+                        render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                    }else if (params.dateParution == null || params.dateParution == "") {
+                        render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                    }
 
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
@@ -281,7 +306,32 @@ class APIController {
         switch (request.getMethod()) {
 
             case "POST": // A FINIR
-                render(status: 404, text: "A FINIR") as JSON
+                if (params.nom == null || params.nom == "") {
+                    render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.ISBN == null || params.ISBN == "") {
+                    render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.auteur == null || params.auteur == "") {
+                    render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.dateParution == null || params.dateParution == "") {
+                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.bibliID == null || params.bibliID == "") {
+                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
+                }
+
+                def bibli = Bibliotheque.findById(params.bibliID)
+                if (bibli == null) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
+                } else {
+
+                    Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
+
+                    bibli.addToLivres(li)
+                    if(bibli.save(flush : true) == null)
+                        render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
+                    else
+                        render(status: 201, text: "Le livre n°${li.id} a été créé avec succés.") as JSON
+                }
+
                 break
 
             case "GET":
@@ -291,7 +341,11 @@ class APIController {
                 } else {
 
                     def livre = Livre.findById(params.idLivre)
-                    if (!livre) {
+
+                    if (livre.bibliotheque.id != bibli.id)
+                        render(status: 404, text: "Le livre n'est pas dans la bibliothéque spécifié") as JSON
+
+                    if (livre == null) {
                         render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
                     } else {
                         withFormat {
@@ -303,8 +357,53 @@ class APIController {
                 }
                 break
 
-            case "PUT": // A FINIR
-                render(status: 404, text: "PUT") as JSON
+            case "PUT":
+
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque (${params.id}) n'existe pas.") as JSON
+                }
+
+
+                def livre = Livre.findById(params.idLivre)
+                if (!livre) {
+                    render(status: 404, text: "L'id de ce livre n'existe pas.") as JSON
+                }
+
+                if (livre.bibliotheque.id != bibli.id)
+                    render(status: 404, text: "Le livre n'est pas dans la bibliothéque spécifié") as JSON
+
+                boolean hasBeenModified = false
+
+                if (!(params.nom == null || params.nom == "")) {
+                    livre.nom = params.nom
+                    hasBeenModified = true
+                }
+
+                if (!(params.ISBN == null || params.ISBN == "")) {
+                    livre.ISBN = params.ISBN
+                    hasBeenModified = true
+                }
+
+                if (!(params.auteur == null || params.auteur == "")) {
+                    livre.auteur = params.auteur
+                    hasBeenModified = true
+                }
+
+                if (!(params.dateParution == null || params.dateParution == "")) {
+                    livre.dateParution = APIService.getDateFromStringSeri(params.dateParution)
+                    hasBeenModified = true
+                }
+
+                if (!hasBeenModified) { // rien modifier
+                    render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
+                } else {
+                    if (livre.save(flush: true)) {
+                        render(status: 200, text: "Le livre (${livre.id}) a été modifié.")
+                    } else {
+                        response.status = 400
+                    }
+                }
                 break
 
             case "DELETE":
@@ -318,12 +417,17 @@ class APIController {
                     if (livre == null) {
                         render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
                     } else {
+
+                        if (livre.bibliotheque.id != bibli.id)
+                            render(status: 404, text: "Le livre n'est pas dans la bibliothéque spécifié") as JSON
+
+                        def livreIDDef = livre.id
                         livre.delete(flush: true)
 
                         if ( ! Livre.exists(livre.id))
-                            render(status: 201, text: "Le livre (${livre.id}) a été supprimé.") as JSON
+                            render(status: 201, text: "Le livre ($livreIDDef) a été supprimé.") as JSON
                         else
-                            render(status: 404, text: "Le livre (${livre.id}) n'a pas pu être supprimé.") as JSON
+                            render(status: 404, text: "Le livre ($livreIDDef) n'a pas pu être supprimé.") as JSON
                     }
                 }
 
