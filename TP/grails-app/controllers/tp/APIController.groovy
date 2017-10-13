@@ -288,7 +288,7 @@ class APIController {
                     if(bibli.save(flush : true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
-                        render(status: 201, text: "Le livre n°${li.id} a été créé avec succés.") as JSON
+                        render(status: 201, text: "$li.id") as JSON
                 }
 
                 break
@@ -314,11 +314,9 @@ class APIController {
                     render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.dateParution == null || params.dateParution == "") {
                     render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
-                } else if (params.bibliID == null || params.bibliID == "") {
-                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
                 }
 
-                def bibli = Bibliotheque.findById(params.bibliID)
+                def bibli = Bibliotheque.findById(params.id)
                 if (bibli == null) {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
@@ -329,7 +327,7 @@ class APIController {
                     if(bibli.save(flush : true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
-                        render(status: 201, text: "Le livre n°${li.id} a été créé avec succés.") as JSON
+                        render(status: 201, text: "$li.id") as JSON
                 }
 
                 break
