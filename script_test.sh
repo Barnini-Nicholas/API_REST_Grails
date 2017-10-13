@@ -21,13 +21,20 @@ curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL -d "nom=jo
 
 echo ""
 echo ""
-echo "GET"
+echo "GET/JSON"
 curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURL
 echo ""
-echo ""
+echo 
+echo "GET/XML"
 curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURL
 
 echo ""
 echo ""
 echo "DELETE"
 curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURL
+
+
+
+echo ""
+echo ""
+echo "REQUETE IMBRIQUE"

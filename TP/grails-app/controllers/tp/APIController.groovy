@@ -10,6 +10,10 @@ import grails.transaction.Transactional
 class APIController {
 
     def bibliotheque() {
+
+
+        println("PARAMS: " + params)
+
         switch (request.getMethod()) {
 
             case "POST": // Créer
@@ -34,7 +38,6 @@ class APIController {
 
             case "GET": // Récupérer
 
-                println(params)
                 def bibli = Bibliotheque.findById(params.id)
                 if (!bibli) {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
@@ -105,6 +108,9 @@ class APIController {
     }
 
     def livre() {
+
+        println("PARAMS: " + params)
+
         switch (request.getMethod()) {
 
             case "POST": // Créer
@@ -205,6 +211,8 @@ class APIController {
 
     def listLivreDansUneBibliotheque(){
 
+        println("PARAMS: " + params)
+
         switch (request.getMethod()) {
             case "GET":
 
@@ -241,10 +249,92 @@ class APIController {
 
                 break
 
+            case "POST":
+                // A FINIR
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
+                } else {
+
+                    Livre li = new Livre(params)
+                    //li.dateParution=
+
+                    bibli.addToLivres(li)
+                    if(!bibli.save())
+                        render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
+                    else
+                        render(status: 201, text: "Le livre n°${li.id} a été créé avec succés.") as JSON
+                }
+
+                break
+
             default:
                 render(status: 404, text: "Uniquement GET et DELETE supporté pour \"API/bibliotheque/<id>/livres.\"") as JSON
                 break
         }
+    }
+
+    def UnLivreDansUneBibliotheque(){
+
+        println("PARAMS: " + params)
+
+        switch (request.getMethod()) {
+
+            case "POST": // A FINIR
+                render(status: 404, text: "A FINIR") as JSON
+                break
+
+            case "GET":
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque (${params.id}) n'existe pas.") as JSON
+                } else {
+
+                    def livre = Livre.findById(params.idLivre)
+                    if (!livre) {
+                        render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
+                    } else {
+                        withFormat {
+                            json { render livre as JSON }
+                            xml { render livre as XML }
+                        }
+                    }
+
+                }
+                break
+
+            case "PUT": // A FINIR
+                render(status: 404, text: "PUT") as JSON
+                break
+
+            case "DELETE":
+
+                def bibli = Bibliotheque.findById(params.id)
+                if (!bibli) {
+                    render(status: 404, text: "L'id de cette bibliotheque (${params.id}) n'existe pas.") as JSON
+                } else {
+
+                    def livre = Livre.findById(params.idLivre)
+                    if (livre == null) {
+                        render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
+                    } else {
+                        livre.delete(flush: true)
+
+                        if ( ! Livre.exists(livre.id))
+                            render(status: 201, text: "Le livre (${livre.id}) a été supprimé.") as JSON
+                        else
+                            render(status: 404, text: "Le livre (${livre.id}) n'a pas pu être supprimé.") as JSON
+                    }
+                }
+
+                break
+
+            default:
+                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
+                break;
+
+        }
+
     }
 
 
