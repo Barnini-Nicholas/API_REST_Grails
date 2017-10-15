@@ -89,8 +89,8 @@ class APIController {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
                     def IDdef = bibli.id
-                    bibli.delete()
-                    if (bibli.save(flush: true))
+                    bibli.delete(flush : true)
+                    if (! Bibliotheque.exists(IDdef))
                         render(status: 200, text: "La bibliotheque ($IDdef) a été supprimé.") as JSON
                     else
                         render(status: 404, text: "La bibliotheque ($IDdef) n'a pas pu être supprimé.") as JSON
@@ -103,7 +103,7 @@ class APIController {
         //break;
 
             default:
-                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
+                render(status: 405, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
                 break;
         }
     }
@@ -207,7 +207,7 @@ class APIController {
                 } else {
                     def livreIDdef = livre.id
                     livre.delete(flush: true)
-                    if (livre.save(flush: true))
+                    if ( ! Livre.exists(livreIDdef) )
                         render(status: 200, text: "Le livre ($livreIDdef) a été supprimé.") as JSON
                     else
                         render(status: 404, text: "Le livre ($livreIDdef) n'a pas pu être supprimé.") as JSON
@@ -220,7 +220,7 @@ class APIController {
         //break;
 
             default:
-                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
+                render(status: 405, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
                 break;
         }
     }
@@ -294,7 +294,7 @@ class APIController {
                 break
 
             default:
-                render(status: 404, text: "Uniquement GET et DELETE supporté pour \"API/bibliotheque/<id>/livres.\"") as JSON
+                render(status: 405, text: "Uniquement GET, POST et DELETE supporté pour \"API/bibliotheque/<id>/livres.\"") as JSON
                 break
         }
     }
@@ -432,19 +432,156 @@ class APIController {
                 break
 
             default:
-                render(status: 404, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
+                render(status: 405, text: "Vous essayez d'utiliser autres chose que GET/PUT/POST/DELETE.") as JSON
                 break;
 
         }
 
     }
 
+    def listBibliotheque (){
+
+        println("PARAMS: " + params)
+
+        switch (request.getMethod()) {
+            case "GET":
+
+                def bibli = Bibliotheque.findAll()
+                if (bibli.size() < 1) {
+                    render(status: 404, text: "Aucune bibliothéque à afficher.") as JSON
+                } else {
+
+                    withFormat {
+                        json { render bibli as JSON }
+                        xml { render bibli as XML }
+                    }
+                }
+
+                break
+
+            case "DELETE":
+
+                def bibli = Bibliotheque.findAll()
+                if (bibli.size() < 1) {
+                    render(status: 404, text: "Aucune bibliothéque à supprimer.") as JSON
+                } else {
+
+                    bibli.each {bibliotheque ->
+                        bibliotheque.delete(flush: true)
+                    }
+
+                    render(status: 200, text: "Les bibliothéques ainsi que leurs livres correspondants ont bien été supprimés.") as JSON
+                }
+
+                break
+
+            case "POST":
+
+                if (params.nom == null || params.nom == "") {
+                    render(status: 404, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
+                } else if (params.adresse == null || params.adresse == "") {
+                    render(status: 404, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
+                } else if (params.anneeConstruction == null || params.anneeConstruction == "") {
+                    render(status: 404, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
+                }
+
+                def bibliInstance = new Bibliotheque(params)
+                if (bibliInstance.save(flush: true)) {
+                    render(status: 201, text: "${bibliInstance.id}")
+                } else {
+                    response.status = 404
+                }
+
+
+                break
+
+            default:
+                render(status: 405, text: "Uniquement GET, POST et DELETE supporté pour \"API/bibliotheques.\"") as JSON
+                break
+        }
+    }
+
+    def listLivre(){
+
+
+        println("PARAMS: " + params)
+
+        switch (request.getMethod()) {
+            case "GET":
+
+                def livres = Livre.findAll()
+                if (livres.size() < 1) {
+                    render(status: 404, text: "Aucun livres à afficher.") as JSON
+                } else {
+
+                    withFormat {
+                        json { render livres as JSON }
+                        xml { render livres as XML }
+                    }
+                }
+
+                break
+
+            case "DELETE":
+
+                def livres = Livre.findAll()
+                if (livres.size() < 1) {
+                    render(status: 404, text: "Aucun livres à supprimer.") as JSON
+                } else {
+
+                    livres.each {livre ->
+                        livre.delete(flush: true)
+                    }
+
+                    render(status: 200, text: "Les livres ont bien été supprimés.") as JSON
+                }
+
+                break
+
+            case "POST":
+
+                if (params.nom == null || params.nom == "") {
+                    render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.ISBN == null || params.ISBN == "") {
+                    render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.auteur == null || params.auteur == "") {
+                    render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.dateParution == null || params.dateParution == "") {
+                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                } else if (params.bibliID == null || params.bibliID == "") {
+                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
+                }
+
+                def bibli = Bibliotheque.findById(params.bibliID)
+                if (bibli == null) {
+                    render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
+                } else {
+
+                    Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
+
+                    bibli.addToLivres(li)
+                    if(bibli.save(flush : true) == null)
+                        render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
+                    else
+                        render(status: 201, text: "${li.id}") as JSON
+                }
+
+                break
+
+            default:
+                render(status: 405, text: "Uniquement GET, POST et DELETE supporté pour \"API/livres.\"") as JSON
+                break
+        }
+    }
+
     def erreurPartieURLManquante (){
         render(status: 404, text: "L'URL indiqué est mauvaise. Vous pouvez utiliser : \n" +
                 " - <racine>/API/bibliotheque/<idBibli>/livre/<idLivre>\n" +
                 " - <racine>/API/bibliotheque/<idBibli>/livres\n" +
+                " - <racine>/API/bibliotheques\n" +
                 " - <racine>/API/bibliotheque/<idBibli>\n" +
-                " - <racine>/API/livre/<idLivre>") as JSON
+                " - <racine>/API/livre/<idLivre>\n" +
+                " - <racine>/API/livres") as JSON
 
     }
 
