@@ -14,4 +14,8 @@ class APIService {
 
         return dateLivre
     }
+
+    static boolean isInt(String s){
+        return s != null && s.matches("\\d+")
+    }
 }
