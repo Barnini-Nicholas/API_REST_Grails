@@ -66,7 +66,7 @@ class APIController {
                     bibli.adresse = params.adresse
                     hasBeenModified = true
                 }
-                if (!(params.anneeConstruction == null || params.anneeConstruction == "")) {
+                if (!(params.anneeConstruction == null || params.anneeConstruction == "" ||  ! APIService.isInt(params.anneeConstruction))) {
                     bibli.anneeConstruction = Integer.parseInt(params.anneeConstruction)
                     hasBeenModified = true
                 }
@@ -483,8 +483,8 @@ class APIController {
                     render(status: 400, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.adresse == null || params.adresse == "") {
                     render(status: 400, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
-                } else if (params.anneeConstruction == null || params.anneeConstruction == "") {
-                    render(status: 400, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
+                } else if (params.anneeConstruction == null || params.anneeConstruction == "" ||  ! APIService.isInt(params.anneeConstruction)) {
+                    render(status: 400, text: "L'anneeConstruction n'a pas été fourni ou n'est pas un entier") as JSON
                 }
 
                 def bibliInstance = new Bibliotheque(params)
