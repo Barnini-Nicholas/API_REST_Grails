@@ -19,11 +19,11 @@ class APIController {
             case "POST": // Créer
 
                 if (params.nom == null || params.nom == "") {
-                    render(status: 404, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.adresse == null || params.adresse == "") {
-                    render(status: 404, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.anneeConstruction == null || params.anneeConstruction == "") {
-                    render(status: 404, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
                 }
 
                 def bibliInstance = new Bibliotheque(params)
@@ -72,12 +72,12 @@ class APIController {
                 }
 
                 if (!hasBeenModified) { // rien modifier
-                    render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
+                    render(status: 400, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
                     if (bibli.save(flush: true)) {
                         render(status: 200, text: "La bibliotheque (${bibli.id}) a été modifié.")
                     } else {
-                        response.status = 400
+                        response.status = 404
                     }
                 }
                 break;
@@ -118,15 +118,15 @@ class APIController {
 
 
                 if (params.nom == null || params.nom == "") {
-                    render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.ISBN == null || params.ISBN == "") {
-                    render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.auteur == null || params.auteur == "") {
-                    render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.dateParution == null || params.dateParution == "") {
-                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "La date n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.bibliID == null || params.bibliID == "") {
-                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
                 }
 
                 def bibli = Bibliotheque.findById(params.bibliID)
@@ -188,12 +188,12 @@ class APIController {
                 }
 
                 if (!hasBeenModified) { // rien modifier
-                    render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
+                    render(status: 400, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
                     if (livre.save(flush: true)) {
                         render(status: 200, text: "Le livre (${livre.id}) a été modifié.")
                     } else {
-                        response.status = 400
+                        response.status = 404
                     }
                 }
                 break;
@@ -273,13 +273,13 @@ class APIController {
                 } else {
 
                     if (params.nom == null || params.nom == "") {
-                        render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                        render(status: 400, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
                     } else if (params.ISBN == null || params.ISBN == "") {
-                        render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                        render(status: 400, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                     } else if (params.auteur == null || params.auteur == "") {
-                        render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                        render(status: 400, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
                     }else if (params.dateParution == null || params.dateParution == "") {
-                        render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                        render(status: 400, text: "La date n'a pas été fourni pour créer le livre") as JSON
                     }
 
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
@@ -307,13 +307,13 @@ class APIController {
 
             case "POST": // A FINIR
                 if (params.nom == null || params.nom == "") {
-                    render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.ISBN == null || params.ISBN == "") {
-                    render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.auteur == null || params.auteur == "") {
-                    render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.dateParution == null || params.dateParution == "") {
-                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "La date n'a pas été fourni pour créer le livre") as JSON
                 }
 
                 def bibli = Bibliotheque.findById(params.id)
@@ -340,17 +340,19 @@ class APIController {
 
                     def livre = Livre.findById(params.idLivre)
 
+                    if (livre == null) {
+                        render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
+                    }
+
                     if (livre.bibliotheque.id != bibli.id)
                         render(status: 404, text: "Le livre n'est pas dans la bibliothéque spécifié") as JSON
 
-                    if (livre == null) {
-                        render(status: 404, text: "L'id de ce livre (${params.idLivre}) n'existe pas.") as JSON
-                    } else {
-                        withFormat {
-                            json { render livre as JSON }
-                            xml { render livre as XML }
-                        }
+
+                    withFormat {
+                        json { render livre as JSON }
+                        xml { render livre as XML }
                     }
+
 
                 }
                 break
@@ -394,12 +396,12 @@ class APIController {
                 }
 
                 if (!hasBeenModified) { // rien modifier
-                    render(status: 404, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
+                    render(status: 400, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
                     if (livre.save(flush: true)) {
                         render(status: 200, text: "Le livre (${livre.id}) a été modifié.")
                     } else {
-                        response.status = 400
+                        response.status = 404
                     }
                 }
                 break
@@ -478,11 +480,11 @@ class APIController {
             case "POST":
 
                 if (params.nom == null || params.nom == "") {
-                    render(status: 404, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.adresse == null || params.adresse == "") {
-                    render(status: 404, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.anneeConstruction == null || params.anneeConstruction == "") {
-                    render(status: 404, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
+                    render(status: 400, text: "L'anneeConstruction n'a pas été fourni pour créer la bibliothéque") as JSON
                 }
 
                 def bibliInstance = new Bibliotheque(params)
@@ -541,15 +543,15 @@ class APIController {
             case "POST":
 
                 if (params.nom == null || params.nom == "") {
-                    render(status: 404, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "Le nom n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.ISBN == null || params.ISBN == "") {
-                    render(status: 404, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.auteur == null || params.auteur == "") {
-                    render(status: 404, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.dateParution == null || params.dateParution == "") {
-                    render(status: 404, text: "La date n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "La date n'a pas été fourni pour créer le livre") as JSON
                 } else if (params.bibliID == null || params.bibliID == "") {
-                    render(status: 404, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
+                    render(status: 400, text: "La bibliID n'a pas été fourni pour créer le livre") as JSON
                 }
 
                 def bibli = Bibliotheque.findById(params.bibliID)
