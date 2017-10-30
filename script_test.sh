@@ -2,6 +2,29 @@
 
 #set -x
 
+if [[ $1 == "--help" ]] || [[ $1 == "-h" ]] ; then
+	echo ""
+	echo "UTILISATION : $0 [OPTION]"
+	echo ""
+	echo "OBJECTIF : Permet de tester l'API RESTfull des bibliotheques et des livres."
+	echo ""
+	echo "OPTION :"
+	echo -e "\t--bib,\t\tBiliothèque avec ID."
+	echo -e "\t--liv,\t\tLivre avec ID."
+	echo -e "\t--riList,\tListe de livres d'une bibliotheque donnée (requête imbriqué)."
+	echo -e "\t--riUnique,\tLivre avec ID pour une biliotheque donnée  (requête imbriqué)."
+	echo -e "\t--bibList,\tListe des bibliotheques."
+	echo -e "\t--livList,\tListe des livres."
+	echo ""
+	echo "AUTEUR : Barnini Nicholas"
+	echo ""
+	echo "EXEMPLE : "
+	echo -e "\t$0"
+	echo -e "\t$0 --all"
+	echo -e "\t$0 --riList"
+	exit 0
+fi
+
 if [[ $# -eq 0 ]] ; then
     TODO="--all"
 elif [ $1 == "--bib" ] || [ $1 == "--liv" ]  || [ $1 == "--riList" ] || [ $1 == "--riUnique" ] || [ $1 == "--bibList" ] || [ $1 == "--livList" ] || [ $1 == "--all" ] ; then
