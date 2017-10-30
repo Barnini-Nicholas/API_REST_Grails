@@ -578,12 +578,12 @@ class APIController {
 
     def erreurPartieURLManquante (){
         render(status: 404, text: "L'URL indiqué est mauvaise. Vous pouvez utiliser : \n" +
-                " - <racine>/API/bibliotheque/<idBibli>/livre/<idLivre>\n" +
-                " - <racine>/API/bibliotheque/<idBibli>/livres\n" +
-                " - <racine>/API/bibliotheques\n" +
-                " - <racine>/API/bibliotheque/<idBibli>\n" +
-                " - <racine>/API/livre/<idLivre>\n" +
-                " - <racine>/API/livres") as JSON
+                " - (racine)/API/bibliotheque/(idBibli)/livre/(idLivre)\n" +
+                " - (racine)/API/bibliotheque/(idBibli)/livres\n" +
+                " - (racine)/API/bibliotheques\n" +
+                " - (racine)/API/bibliotheque/(idBibli)\n" +
+                " - (racine)/API/livre/(idLivre)\n" +
+                " - (racine)/API/livres") as JSON
 
     }
 
