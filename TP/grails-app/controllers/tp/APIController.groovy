@@ -3,16 +3,47 @@ package tp
 import grails.converters.JSON
 import grails.converters.XML
 
-import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
 class APIController {
 
+    public TokenService = new TokenService();
+
+    String pseudo = "admin";
+    String pwd = "pwdAdmin";
+
+
+    def getToken() {
+
+        if (params.pseudo == null || params.pseudo == "") {
+            render(status: 400, text: "Le pseudo n'a pas été fourni pour récupérer un token") as JSON
+        } else if (params.password == null || params.password == "") {
+            render(status: 400, text: "Le password n'a pas été fourni pour récupérer un token") as JSON
+        }
+
+        if (pseudo == params.pseudo && pwd == params.password) {
+            System.out.println("TOKEN : Création d'un token -> " + new Date().toString())
+            String returnedToken = TokenService.createToken(new Date(), 60)
+            render(status: 201, text: "${returnedToken}")
+        } else {
+            response.status = 404
+        }
+    }
+
     def bibliotheque() {
 
-
         println("PARAMS: " + params)
+
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
 
         switch (request.getMethod()) {
 
@@ -22,7 +53,7 @@ class APIController {
                     render(status: 400, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.adresse == null || params.adresse == "") {
                     render(status: 400, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
-                } else if (params.anneeConstruction == null || params.anneeConstruction == "" ||  ! APIService.isInt(params.anneeConstruction)) {
+                } else if (params.anneeConstruction == null || params.anneeConstruction == "" || !APIService.isInt(params.anneeConstruction)) {
                     render(status: 400, text: "L'anneeConstruction n'a pas été fourni ou n'est pas un entier.") as JSON
                 }
 
@@ -66,7 +97,7 @@ class APIController {
                     bibli.adresse = params.adresse
                     hasBeenModified = true
                 }
-                if (!(params.anneeConstruction == null || params.anneeConstruction == "" ||  ! APIService.isInt(params.anneeConstruction))) {
+                if (!(params.anneeConstruction == null || params.anneeConstruction == "" || !APIService.isInt(params.anneeConstruction))) {
                     bibli.anneeConstruction = Integer.parseInt(params.anneeConstruction)
                     hasBeenModified = true
                 }
@@ -89,8 +120,8 @@ class APIController {
                     render(status: 404, text: "L'id de cette bibliotheque n'existe pas.") as JSON
                 } else {
                     def IDdef = bibli.id
-                    bibli.delete(flush : true)
-                    if (! Bibliotheque.exists(IDdef))
+                    bibli.delete(flush: true)
+                    if (!Bibliotheque.exists(IDdef))
                         render(status: 200, text: "La bibliotheque ($IDdef) a été supprimé.") as JSON
                     else
                         render(status: 404, text: "La bibliotheque ($IDdef) n'a pas pu être supprimé.") as JSON
@@ -111,6 +142,16 @@ class APIController {
     def livre() {
 
         println("PARAMS: " + params)
+
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
 
         switch (request.getMethod()) {
 
@@ -137,7 +178,7 @@ class APIController {
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
                     bibli.addToLivres(li)
-                    if(bibli.save(flush : true) == null)
+                    if (bibli.save(flush: true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
                         render(status: 201, text: "${li.id}") as JSON
@@ -207,7 +248,7 @@ class APIController {
                 } else {
                     def livreIDdef = livre.id
                     livre.delete(flush: true)
-                    if ( ! Livre.exists(livreIDdef) )
+                    if (!Livre.exists(livreIDdef))
                         render(status: 200, text: "Le livre ($livreIDdef) a été supprimé.") as JSON
                     else
                         render(status: 404, text: "Le livre ($livreIDdef) n'a pas pu être supprimé.") as JSON
@@ -225,9 +266,19 @@ class APIController {
         }
     }
 
-    def listLivreDansUneBibliotheque(){
+    def listLivreDansUneBibliotheque() {
 
         println("PARAMS: " + params)
+
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
 
         switch (request.getMethod()) {
             case "GET":
@@ -255,7 +306,7 @@ class APIController {
                 } else {
 
                     def livres = Livre.findAllByBibliotheque(bibli)
-                    livres.each {livre ->
+                    livres.each { livre ->
                         bibli.removeFromLivres(livre)
                         livre.delete(flush: true)
                     }
@@ -278,14 +329,14 @@ class APIController {
                         render(status: 400, text: "L'ISBN n'a pas été fourni pour créer le livre") as JSON
                     } else if (params.auteur == null || params.auteur == "") {
                         render(status: 400, text: "L'auteur n'a pas été fourni pour créer le livre") as JSON
-                    }else if (params.dateParution == null || params.dateParution == "") {
+                    } else if (params.dateParution == null || params.dateParution == "") {
                         render(status: 400, text: "La date n'a pas été fourni pour créer le livre") as JSON
                     }
 
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
                     bibli.addToLivres(li)
-                    if(bibli.save(flush : true) == null)
+                    if (bibli.save(flush: true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
                         render(status: 201, text: "$li.id") as JSON
@@ -299,9 +350,19 @@ class APIController {
         }
     }
 
-    def UnLivreDansUneBibliotheque(){
+    def UnLivreDansUneBibliotheque() {
 
         println("PARAMS: " + params)
+
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
 
         switch (request.getMethod()) {
 
@@ -324,7 +385,7 @@ class APIController {
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
                     bibli.addToLivres(li)
-                    if(bibli.save(flush : true) == null)
+                    if (bibli.save(flush: true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
                         render(status: 201, text: "$li.id") as JSON
@@ -424,7 +485,7 @@ class APIController {
                         def livreIDDef = livre.id
                         livre.delete(flush: true)
 
-                        if ( ! Livre.exists(livre.id))
+                        if (!Livre.exists(livre.id))
                             render(status: 201, text: "Le livre ($livreIDDef) a été supprimé.") as JSON
                         else
                             render(status: 404, text: "Le livre ($livreIDDef) n'a pas pu être supprimé.") as JSON
@@ -441,9 +502,19 @@ class APIController {
 
     }
 
-    def listBibliotheque (){
+    def listBibliotheque() {
 
         println("PARAMS: " + params)
+
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
 
         switch (request.getMethod()) {
             case "GET":
@@ -468,7 +539,7 @@ class APIController {
                     render(status: 404, text: "Aucune bibliothéque à supprimer.") as JSON
                 } else {
 
-                    bibli.each {bibliotheque ->
+                    bibli.each { bibliotheque ->
                         bibliotheque.delete(flush: true)
                     }
 
@@ -483,7 +554,7 @@ class APIController {
                     render(status: 400, text: "Le nom n'a pas été fourni pour créer la bibliothéque") as JSON
                 } else if (params.adresse == null || params.adresse == "") {
                     render(status: 400, text: "L'adresse n'a pas été fourni pour créer la bibliothéque") as JSON
-                } else if (params.anneeConstruction == null || params.anneeConstruction == "" ||  ! APIService.isInt(params.anneeConstruction)) {
+                } else if (params.anneeConstruction == null || params.anneeConstruction == "" || !APIService.isInt(params.anneeConstruction)) {
                     render(status: 400, text: "L'anneeConstruction n'a pas été fourni ou n'est pas un entier") as JSON
                 }
 
@@ -503,11 +574,20 @@ class APIController {
         }
     }
 
-    def listLivre(){
+    def listLivre() {
 
 
         println("PARAMS: " + params)
 
+        System.out.println("params.token == " + params.token)
+        if (params.token == null || params.token == "") {
+            this.render(status: 400, text: "Le token n'a pas été fourni dans la requête") as JSON
+            return false
+        }
+        if (!TokenService.isValid(params.token)) {
+            this.render(status: 404, text: "Le token n'est plus valide") as JSON
+            return false
+        }
         switch (request.getMethod()) {
             case "GET":
 
@@ -531,7 +611,7 @@ class APIController {
                     render(status: 404, text: "Aucun livres à supprimer.") as JSON
                 } else {
 
-                    livres.each {livre ->
+                    livres.each { livre ->
                         livre.delete(flush: true)
                     }
 
@@ -562,7 +642,7 @@ class APIController {
                     Livre li = new Livre(nom: params.nom, dateParution: APIService.getDateFromStringSeri(params.dateParution), ISBN: params.ISBN, auteur: params.auteur)
 
                     bibli.addToLivres(li)
-                    if(bibli.save(flush : true) == null)
+                    if (bibli.save(flush: true) == null)
                         render(status: 404, text: "Le livre n'a pas pu être sauvegardé.") as JSON
                     else
                         render(status: 201, text: "${li.id}") as JSON
@@ -576,7 +656,7 @@ class APIController {
         }
     }
 
-    def erreurPartieURLManquante (){
+    def erreurPartieURLManquante() {
         render(status: 404, text: "L'URL indiqué est mauvaise. Vous pouvez utiliser : \n" +
                 " - (racine)/API/bibliotheque/(idBibli)/livre/(idLivre)\n" +
                 " - (racine)/API/bibliotheque/(idBibli)/livres\n" +
