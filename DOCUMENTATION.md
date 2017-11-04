@@ -1,5 +1,6 @@
 # Spécifications et documentation technique
 
+Documentation détaillant chaque appel possible, les méthodes possible, les data d'entrée/sortie, les codes retour et des exemples.
 
 ## Récupérer un token
 
