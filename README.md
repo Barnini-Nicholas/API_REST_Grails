@@ -14,4 +14,4 @@ Pour tester l'API vous pouvez utiliser le script bash "script_test.sh". Grâce �
 
 ## Token
 
-L'API nécessite d'utiliser dans un premier temps l'appel à <racine>/API/getToken?pseudo=<pseudo>&password=<password> pour récuper un token hasher en sha1 avec un salt, valide pour 60 secondes, qui doit être envoyé en paramètre à chaque requête (pour un exemple regarder le script de test d'API).
+L'API nécessite d'utiliser dans un premier temps l'appel à (racine)/API/getToken?pseudo=(pseudo)&password=(password) pour récuper un token hasher en sha1 avec un salt, valide pour 60 secondes, qui doit être envoyé en paramètre à chaque requête (pour un exemple regarder le script de test d'API). Pour connaître l'appel exact : [ici](DOCUMENTATION.md#Token).
