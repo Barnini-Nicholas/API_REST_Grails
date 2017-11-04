@@ -24,7 +24,7 @@ class APIController {
 
         if (pseudo == params.pseudo && pwd == params.password) {
             System.out.println("TOKEN : Création d'un token -> " + new Date().toString())
-            String returnedToken = TokenService.createToken(new Date(), 60)
+            String returnedToken = TokenService.createToken(new Date(), 60, params.pseudo + params.password)
             render(status: 201, text: "${returnedToken}")
         } else {
             response.status = 404
@@ -658,6 +658,7 @@ class APIController {
 
     def erreurPartieURLManquante() {
         render(status: 404, text: "L'URL indiqué est mauvaise. Vous pouvez utiliser : \n" +
+                " - (racine)/API/getToken?pseudo=admin&password=pwdAdmin\n" +
                 " - (racine)/API/bibliotheque/(idBibli)/livre/(idLivre)\n" +
                 " - (racine)/API/bibliotheque/(idBibli)/livres\n" +
                 " - (racine)/API/bibliotheques\n" +
