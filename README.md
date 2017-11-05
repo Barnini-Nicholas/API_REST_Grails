@@ -9,7 +9,8 @@ API Restfull permettant de gérer des bibliothèques et leurs livres. Cette API 
 
 ## Tester l'API
 
-Pour tester l'API vous pouvez utiliser le script bash "script_test.sh". Grâce à ce script vous pouvez tester la totalité de l'API ou uniquement certaines parties (juste les livres d'une bibliothéque, toutes les bibliothèques, etc.), une option "--help" est disponible.
+ - Pour tester l'API vous pouvez utiliser le script bash "script_test_réussite.sh". Grâce à ce script vous pouvez tester la totalité de l'API ou uniquement certaines parties (juste les livres d'une bibliothéque, toutes les bibliothèques, etc.), une option "--help" est disponible. Ce premier script test tout les case de réussite.
+ - Pour tester les cas d'erreur de l'API on peut vérifier avec le script "script_test_réussite.sh". Il affiche le cas d'erreur supposé être affiché. Comme le script précedent, on le lancer en totalité ou seulement une partie. Voir le --help.
 
 
 ## Token
