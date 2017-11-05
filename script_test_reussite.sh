@@ -64,7 +64,7 @@ if [[ $TODO == "--bib" ]] || [[ $1 == "--all" ]] ; then
 	echo ""
 	echo ""
 	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "nom=jojookoko&adresse=ADjijijijR&anneeConstruction=18"
+	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN\&nom=hehe\&adresse=eheh\&anneeConstruction=1888
 
 	echo ""
 	echo ""
@@ -108,7 +108,7 @@ if [[ $TODO == "--liv" ]] || [[ $1 == "--all" ]] ; then
 	echo ""
 	echo ""
 	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/livre/$outputCURL?token=$TOKEN -d "nom=BBBBBBBBBBBBBB&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
+	curl.exe -i -X PUT http://localhost:8080/API/livre/$outputCURL?token=$TOKEN\&nom=BBBBBBBBBBBBBB\&dateParution=2013-02-28T12:24:56Z\&ISBN=allo\&auteur=HUEHUE
 
 	echo ""
 	echo ""
@@ -177,7 +177,7 @@ if [[ $TODO == "--riUnique" ]] || [[ $1 == "--all" ]] ; then
 	echo ""
 	echo ""
 	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN -d "nom=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE&bibliID=1"
+	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN\&nom=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\&dateParution=2013-02-28T12:24:56Z\&ISBN=allo\&auteur=HUEHUE\&bibliID=1
 
 	echo ""
 	echo ""

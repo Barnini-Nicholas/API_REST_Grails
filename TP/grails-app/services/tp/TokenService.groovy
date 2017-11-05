@@ -28,8 +28,8 @@ class TokenService {
 
     public boolean isValid(String token){
         TokenAPI ta = (TokenAPI) listToken.get(token)
-        System.out.println("ta = " + ta)
-        System.out.println("tokenParam = " + token)
+        //System.out.println("ta = " + ta)
+        //System.out.println("tokenParam = " + token)
         if ( ta == null)
             return false
         return ta.isValid()

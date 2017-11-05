@@ -1,0 +1,259 @@
+/////////////////////////////////////////////////////
+///// TOKEN
+
+
+/// On récupere un token
+curl.exe http://localhost:8080/API/getToken -d "pseudo=admin&password=pwdAdmin"
+TOKEN : 22241af90c9745c8f9c6adaef81164bf30e51e84
+/////////////////////////////////////////////////////
+///// BIBLIOTHEQUE
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/bibliotheque/1?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=NOUVEAU&adresse=QQEPART&anneeConstruction=1989"
+OUTPUT : 35
+
+
+/// PUT
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+La bibliotheque (35) a été modifié.
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+{"id":35,"livres":[],"nom":"hehe","adresse":"eheh","anneeConstruction":1888}
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><bibliotheque id="35"><livres /><nom>hehe</nom><adresse>eheh</adresse><anneeConstruction>1888</anneeConstruction></bibliotheque>
+
+/// DELETE
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+La bibliotheque (35) a été supprimé.
+
+/// Création d'une biblio pour le livre
+curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=BIBTEEEEEST&adresse=QQEPARThehe&anneeConstruction=19889"
+OUTPUT : 36
+
+
+/////////////////////////////////////////////////////
+///// LIVRE
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/livre?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=AAAAAAAAAAAAAAAAAAAAAAAAAAAA&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu&bibliID=36"
+OUTPUT : 8
+
+
+/// PUT
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+Le livre (8) a été modifié.
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+{"id":8,"auteur":"HUEHUE","dateParution":"2013-03-28T12:24:56Z","nom":"BBBBBBBBBBBBBB","ISBN":"allo","bibliotheque":{"id":36}}
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><livre id="8"><auteur>HUEHUE</auteur><dateParution>2013-03-28 13:24:56.0 CET</dateParution><nom>BBBBBBBBBBBBBB</nom><ISBN>allo</ISBN><bibliotheque id="36" /></livre>
+
+/// DELETE
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+Le livre (8) a été supprimé.
+
+/////////////////////////////////////////////////////
+///// REQUETE IMBRIQUE - LISTE
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/bibliotheque/36/livres?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL"
+OUTPUT : 9
+
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+[{"id":9,"auteur":"HOLAQUE TAL","dateParution":"2013-03-28T12:24:56Z","nom":"CCCCCCCCCCCCCCCCCCCCCCCCC","ISBN":"NANI","bibliotheque":{"id":36}}]
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:44 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><set><livre id="9"><auteur>HOLAQUE TAL</auteur><dateParution>2013-03-28 13:24:56.0 CET</dateParution><nom>CCCCCCCCCCCCCCCCCCCCCCCCC</nom><ISBN>NANI</ISBN><bibliotheque id="36" /></livre></set>
+
+/// DELETE
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+Les livres ont été supprimés de la bibliothéque n°36 avec succés.
+
+/////////////////////////////////////////////////////
+///// REQUETE IMBRIQUE - UNIQUE
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/bibliotheque/36/livre/1?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=DDDDDDDDDDDDDDDDDDDDD&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu"
+OUTPUT : 10
+
+
+/// PUT
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+Le livre (10) a été modifié.
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+{"id":10,"auteur":"HUEHUE","dateParution":"2013-03-28T12:24:56Z","nom":"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE","ISBN":"allo","bibliotheque":{"id":36}}
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><livre id="10"><auteur>HUEHUE</auteur><dateParution>2013-03-28 13:24:56.0 CET</dateParution><nom>EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE</nom><ISBN>allo</ISBN><bibliotheque id="36" /></livre>
+
+/// DELETE
+HTTP/1.1 201 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+Le livre (10) a été supprimé.
+
+/////////////////////////////////////////////////////
+///// BIBLIOTHEQUE - LISTE
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=BIBLISTE&adresse=QQEPARThehe&anneeConstruction=19889"
+OUTPUT : 37
+
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+[{"id":1,"livres":[{"id":1},{"id":2}],"nom":"bibi0","adresse":"60, chemin du heho","anneeConstruction":199},{"id":2,"livres":[{"id":4},{"id":3}],"nom":"bibi1","adresse":"60, chemin du heho","anneeConstruction":200},{"id":3,"livres":[{"id":5},{"id":6}],"nom":"bibi2","adresse":"60, chemin du heho","anneeConstruction":201},{"id":5,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":7,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":9,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":11,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":13,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":15,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":17,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":19,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":21,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":23,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":25,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":27,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":29,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":31,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":33,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":34,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":36,"livres":[],"nom":"BIBTEEEEEST","adresse":"QQEPARThehe","anneeConstruction":19889},{"id":37,"livres":[],"nom":"BIBLISTE","adresse":"QQEPARThehe","anneeConstruction":19889}]
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><list><bibliotheque id="1"><livres><livre id="1" /><livre id="2" /></livres><nom>bibi0</nom><adresse>60, chemin du heho</adresse><anneeConstruction>199</anneeConstruction></bibliotheque><bibliotheque id="2"><livres><livre id="4" /><livre id="3" /></livres><nom>bibi1</nom><adresse>60, chemin du heho</adresse><anneeConstruction>200</anneeConstruction></bibliotheque><bibliotheque id="3"><livres><livre id="5" /><livre id="6" /></livres><nom>bibi2</nom><adresse>60, chemin du heho</adresse><anneeConstruction>201</anneeConstruction></bibliotheque><bibliotheque id="5"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="7"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="9"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="11"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="13"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="15"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="17"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="19"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="21"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="23"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="25"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="27"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="29"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="31"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="33"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="34"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="36"><livres /><nom>BIBTEEEEEST</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque><bibliotheque id="37"><livres /><nom>BIBLISTE</nom><adresse>QQEPARThehe</adresse><anneeConstruction>19889</anneeConstruction></bibliotheque></list>
+
+/// DELETE
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+Les bibliothéques ainsi que leurs livres correspondants ont bien été supprimés.
+
+/////////////////////////////////////////////////////
+///// LIVRE - LISTE
+
+
+/// Création d'une biblio pour le livre
+curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=BIBTEEEEEST&adresse=QQEPARThehe&anneeConstruction=19889"
+OUTPUT : 38
+
+
+/// POST
+curl.exe  -X POST http://localhost:8080/API/livres?token=22241af90c9745c8f9c6adaef81164bf30e51e84  -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL&bibliID=38"
+OUTPUT : 11
+
+
+/// GET/JSON
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/json;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:45 GMT
+
+[{"id":11,"auteur":"HOLAQUE TAL","dateParution":"2013-03-28T12:24:56Z","nom":"CCCCCCCCCCCCCCCCCCCCCCCCC","ISBN":"NANI","bibliotheque":{"id":38}}]
+
+/// GET/XML
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: application/xml;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:46 GMT
+
+<?xml version="1.0" encoding="UTF-8"?><list><livre id="11"><auteur>HOLAQUE TAL</auteur><dateParution>2013-03-28 13:24:56.0 CET</dateParution><nom>CCCCCCCCCCCCCCCCCCCCCCCCC</nom><ISBN>NANI</ISBN><bibliotheque id="38" /></livre></list>
+
+/// DELETE
+HTTP/1.1 200 
+X-Application-Context: application:development
+Content-Type: text/html;charset=UTF-8
+Transfer-Encoding: chunked
+Date: Sun, 05 Nov 2017 20:38:46 GMT
+
+Les livres ont bien été supprimés.
