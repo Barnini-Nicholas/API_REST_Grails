@@ -41,17 +41,28 @@ fi
 
 	echo ""
 	echo ""
-	echo "/// Lorsqu'on ne donne pas les bons params"
+	echo "/// Lorsqu'on ne donne pas tous les params : code 400"
+	echo "curl.exe http://localhost:8080/API/getToken -d \"pseudo=admin&password=\""
+	curl.exe -i http://localhost:8080/API/getToken  -d "pseudo=admin&password="
+	
+	echo ""
+	echo "curl.exe http://localhost:8080/API/getToken -d \"pseudo=admin\""
 	curl.exe -i http://localhost:8080/API/getToken  -d "pseudo=admin"
-	echo "curl.exe http://localhost:8080/API/getToken -d \"pseudo=admin&password=pwdAdmin\""
-	echo "TOKEN : $TOKEN"
+	
+	echo ""
+	echo ""
+	echo "/// Lorsqu'on donne une mauvaise combinaison pseudo/pwd : code 404"
+	echo "curl.exe http://localhost:8080/API/getToken -d \"pseudo=admin&password=aze\""
+	curl.exe -i http://localhost:8080/API/getToken  -d "pseudo=admin&password=aze"
 
 	echo ""
 	echo ""
-	echo "/// On récupere un token"
-	TOKEN=$(curl.exe http://localhost:8080/API/getToken  -d "pseudo=admin&password=pwdAdmin")
+	echo "/// On récupere un token pour tester la suite"
 	echo "curl.exe http://localhost:8080/API/getToken -d \"pseudo=admin&password=pwdAdmin\""
+	TOKEN=$(curl.exe http://localhost:8080/API/getToken  -d "pseudo=admin&password=pwdAdmin")
 	echo "TOKEN : $TOKEN"
+	
+	
 	
 	
 if [[ $TODO == "--bib" ]] || [[ $1 == "--all" ]] ; then
@@ -62,39 +73,64 @@ if [[ $TODO == "--bib" ]] || [[ $1 == "--all" ]] ; then
 
 	echo ""
 	echo ""
-	echo "/// POST"
+	echo "/// POST fail code : 400 // parametre manquant"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/1?token=$TOKEN  -d "adresse=QQEPART&anneeConstruction=1989")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/1?token=$TOKEN  -d \"adresse=QQEPART&anneeConstruction=1989\""
+	echo "OUTPUT : $outputCURL"
+
+	echo ""
+	echo ""
+	echo "/// POST (pour test la suite)"
 	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/1?token=$TOKEN  -d "nom=NOUVEAU&adresse=QQEPART&anneeConstruction=1989")
 	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/1?token=$TOKEN  -d \"nom=NOUVEAU&adresse=QQEPART&anneeConstruction=1989\""
 	echo "OUTPUT : $outputCURL"
 
+	echo ""
+	echo ""
+	echo "/// PUT id bibli inexistant"
+	echo curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/10000000?token=$TOKEN -d "nom=jojookoko&adresse=ADjijijijR&anneeConstruction=18"
+	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/10000000?token=$TOKEN -d "nom=jojookoko&adresse=ADjijijijR&anneeConstruction=18"
 
 	echo ""
 	echo ""
-	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "nom=jojookoko&adresse=ADjijijijR&anneeConstruction=18"
-
+	echo "/// PUT params manquant"
+	echo curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "adresse=ADjijijijR&anneeConstruction=18"
+	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "adresse=ADjijijijR&anneeConstruction=18"
+	
 	echo ""
 	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN
+	echo "/// PUT annee constrcution n'est pas un int"
+	echo curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "adresse=ADjijijijR&anneeConstruction=ALLO"
+	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN -d "adresse=ADjijijijR&anneeConstruction=ALLO"
+	
+	echo ""
+	echo ""
+	echo "/// GET/JSON id bibli inexistant"
+	echo curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/84284?token=$TOKEN
+	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/84284?token=$TOKEN
+	
 	echo ""
 	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN
+	echo "/// GET/XML token mauvais "
+	echo curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURL?token=randomTOken
+	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURL?token=randomTOken
 
 	echo ""
 	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURL?token=$TOKEN
+	echo "/// DELETE id bibli inexistant"
+	echo curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/84284?token=$TOKEN
+	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/84284?token=$TOKEN
 
 fi
 
 echo ""
 echo ""
-echo "/// Création d'une biblio pour le livre"
+echo "/// Création d'une biblio pour le lirve et tester le token"
 outputCURLBiblioTest=$(curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN -d "nom=BIBTEEEEEST&adresse=QQEPARThehe&anneeConstruction=19889")
 echo "curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN  -d \"nom=BIBTEEEEEST&adresse=QQEPARThehe&anneeConstruction=19889\""
 echo "OUTPUT : $outputCURLBiblioTest"
+
+
 
 
 if [[ $TODO == "--liv" ]] || [[ $1 == "--all" ]] ; then
@@ -106,30 +142,42 @@ if [[ $TODO == "--liv" ]] || [[ $1 == "--all" ]] ; then
 
 	echo ""
 	echo ""
-	echo "/// POST"
+	echo "/// POST (mauvais params) code : 400"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/livre?token=$TOKEN  -d "dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu&bibliID=$outputCURLBiblioTest")
+	echo "curl.exe  -X POST http://localhost:8080/API/livre?token=$TOKEN  -d \"dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu&bibliID=$outputCURLBiblioTest\""
+	echo "OUTPUT : $outputCURL"
+
+	echo ""
+	echo ""
+	echo "/// POST bon pour la suite"
 	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/livre?token=$TOKEN  -d "nom=AAAAAAAAAAAAAAAAAAAAAAAAAAAA&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu&bibliID=$outputCURLBiblioTest")
 	echo "curl.exe  -X POST http://localhost:8080/API/livre?token=$TOKEN  -d \"nom=AAAAAAAAAAAAAAAAAAAAAAAAAAAA&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu&bibliID=$outputCURLBiblioTest\""
 	echo "OUTPUT : $outputCURL"
 
+	
+	echo ""
+	echo ""
+	echo "/// PUT mauvais param 400"
+	echo curl.exe -i -X PUT http://localhost:8080/API/livre/$outputCURL?token=$TOKEN -d "&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
+	curl.exe -i -X PUT http://localhost:8080/API/livre/$outputCURL?token=$TOKEN -d "&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
+	
+	echo ""
+	echo ""
+	echo "/// PUT mauvais id livre 404 "
+	echo curl.exe -i -X PUT http://localhost:8080/API/livre/10000?token=$TOKEN -d "nom=BBBBBBBBBBBBBB&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
+	curl.exe -i -X PUT http://localhost:8080/API/livre/10000?token=$TOKEN -d "nom=BBBBBBBBBBBBBB&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
 
 	echo ""
 	echo ""
-	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/livre/$outputCURL?token=$TOKEN -d "nom=BBBBBBBBBBBBBB&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE"
+	echo "/// GET/JSON mauvais id 404"
+	echo curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/livre/40000?token=$TOKEN
+	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/livre/40000?token=$TOKEN
 
 	echo ""
 	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/livre/$outputCURL?token=$TOKEN
-	echo ""
-	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/livre/$outputCURL?token=$TOKEN
-
-	echo ""
-	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/livre/$outputCURL?token=$TOKEN
+	echo "/// DELETE mauvais id 404"
+	echo curl.exe -i -X DELETE http://localhost:8080/API/livre/40000?token=$TOKEN
+	curl.exe -i -X DELETE http://localhost:8080/API/livre/40000?token=$TOKEN
 
 fi
 
@@ -142,26 +190,43 @@ if [[ $TODO == "--riList" ]] || [[ $1 == "--all" ]] ; then
 	echo "///// REQUETE IMBRIQUE - LISTE"
 
 
+	
 	echo ""
 	echo ""
-	echo "/// POST"
+	echo "/// POST id biblio inexistant 404"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/10000/livres?token=$TOKEN  -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/10000/livres?token=$TOKEN  -d \"nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL\""
+	echo "OUTPUT : $outputCURL"
+	
+		
+	echo ""
+	echo ""
+	echo "/// POST id biblio inexistant 400"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN  -d "dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN  -d \"dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL\""
+	echo "OUTPUT : $outputCURL"
+	
+	
+
+	echo ""
+	echo ""
+	echo "/// POST bon pour la suite"
 	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN  -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL")
 	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN  -d \"nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL\""
 	echo "OUTPUT : $outputCURL"
+	
+	echo ""
+	echo ""
+	echo "/// GET/JSON id biblio inexistant 404"
+	echo	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/95959/livres?token=$TOKEN
+	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/95959/livres?token=$TOKEN
+	
 
 	echo ""
 	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN
-	echo ""
-	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN
-
-	echo ""
-	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livres?token=$TOKEN
+	echo "/// DELETE id biblio inexistant 404"
+	echo curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/5454/livres?token=$TOKEN
+	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/5454/livres?token=$TOKEN
 
 fi
 
@@ -176,29 +241,44 @@ if [[ $TODO == "--riUnique" ]] || [[ $1 == "--all" ]] ; then
 
 	echo ""
 	echo ""
-	echo "/// POST"
+	echo "/// POST mauvais id bibli 404 "
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/400000/livre/1?token=$TOKEN  -d "nom=DDDDDDDDDDDDDDDDDDD&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/400000/livre/1?token=$TOKEN  -d \"nom=DDDDDDDDDDDDDDDDDDDDD&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu\""
+	echo "OUTPUT : $outputCURL"
+	
+	echo ""
+	echo ""
+	echo "/// POST probleme de params 400 "
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/1?token=$TOKEN  -d "nom=&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/1?token=$TOKEN  -d \"nom=&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu\""
+	echo "OUTPUT : $outputCURL"
+	
+	echo ""
+	echo ""
+	echo "/// POST bon pour la suite"
 	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/1?token=$TOKEN  -d "nom=DDDDDDDDDDDDDDDDDDD&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu")
 	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/1?token=$TOKEN  -d \"nom=DDDDDDDDDDDDDDDDDDDDD&dateParution=2013-02-28T12:24:56Z&ISBN=ui&auteur=huhu\""
 	echo "OUTPUT : $outputCURL"
 
-	echo ""
-	echo ""
-	echo "/// PUT"
-	curl.exe -i -X PUT http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN -d "nom=EEEEEEEEEEEEEEEEEEEEEEEEEEEEEE&dateParution=2013-02-28T12:24:56Z&ISBN=allo&auteur=HUEHUE&bibliID=1"
 
-	echo ""
-	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN
 	echo ""
 	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN
+	echo "/// GET/XML mauvais id biblio 404"
+	echo 	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/7979/livre/$outputCURL?token=$TOKEN
+	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheque/7979/livre/$outputCURL?token=$TOKEN
 
 	echo ""
 	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/$outputCURL?token=$TOKEN
+	echo "/// DELETE mauvais id bibli"
+	echo curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/7998/livre/$outputCURL?token=$TOKEN
+	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/7998/livre/$outputCURL?token=$TOKEN
+	
+	
+	echo ""
+	echo ""
+	echo "/// DELETE mauvais id livre "
+	echo curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/92754?token=$TOKEN
+	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest/livre/92754?token=$TOKEN
 
 fi
 
@@ -210,27 +290,20 @@ if [[ $TODO == "--bibList" ]] || [[ $1 == "--all" ]] ; then
 	echo "/////////////////////////////////////////////////////"
 	echo "///// BIBLIOTHEQUE - LISTE"
 
-
 	echo ""
 	echo ""
-	echo "/// POST"
-	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN -d "nom=BIBLISTE&adresse=QQEPARThehe&anneeConstruction=19889")
+	echo "/// POST mauvais params 400 "
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN -d "adresse=QQEPARThehe&anneeConstruction=19889")
 	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN  -d \"nom=BIBLISTE&adresse=QQEPARThehe&anneeConstruction=19889\""
 	echo "OUTPUT : $outputCURL"
 
 	echo ""
 	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheques?token=$TOKEN
-	echo ""
-	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/bibliotheques?token=$TOKEN
+	echo "/// POST bon pour la suite"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN -d "nom=BIBLISTE&adresse=QQEPARThehe&anneeConstruction=19889")
+	echo "curl.exe  -X POST http://localhost:8080/API/bibliotheques?token=$TOKEN  -d \"nom=BIBLISTE&adresse=QQEPARThehe&anneeConstruction=19889\""
+	echo "OUTPUT : $outputCURL"
 
-	echo ""
-	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/bibliotheques?token=$TOKEN
 
 fi
 
@@ -252,24 +325,28 @@ if [[ $TODO == "--livList" ]] || [[ $1 == "--all" ]] ; then
 
 	echo ""
 	echo ""
-	echo "/// POST"
-	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/livres?token=$TOKEN -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL&bibliID=$outputCURLBiblioTest")
+	echo "/// POST mauvais id bibli en data"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/livres?token=$TOKEN -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL&bibliID=84545")
+	echo "curl.exe  -X POST http://localhost:8080/API/livres?token=$TOKEN  -d \"nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL&bibliID=84545\""
+	echo "OUTPUT : $outputCURL"
+	
+	
+	echo ""
+	echo ""
+	echo "/// POST mauvais param"
+	outputCURL=$(curl.exe  -X POST http://localhost:8080/API/livres?token=$TOKEN -d "nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&auteur=HOLAQUE TAL&bibliID=$outputCURLBiblioTest")
 	echo "curl.exe  -X POST http://localhost:8080/API/livres?token=$TOKEN  -d \"nom=CCCCCCCCCCCCCCCCCCCCCCCCC&dateParution=2013-02-28T12:24:56Z&ISBN=NANI&auteur=HOLAQUE TAL&bibliID=$outputCURLBiblioTest\""
 	echo "OUTPUT : $outputCURL"
 
-	echo ""
-	echo ""
-	echo "/// GET/JSON"
-	curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/livres?token=$TOKEN
-	echo ""
-	echo 
-	echo "/// GET/XML"
-	curl.exe -i -H "Accept: application/xml"  -X GET http://localhost:8080/API/livres?token=$TOKEN
-
-	echo ""
-	echo ""
-	echo "/// DELETE"
-	curl.exe -i -X DELETE http://localhost:8080/API/livres?token=$TOKEN
 	
 fi
 
+echo ""
+echo ""
+echo "/////////////////////////////////////////////////////"
+echo "///// MAUVAIS TOKEN"
+echo ""
+echo ""
+echo "/// GET/JSON avec un token mauvais" 
+echo curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest?token="MAUVAISTOKEN"
+curl.exe -i -H "Accept: application/json" -X GET http://localhost:8080/API/bibliotheque/$outputCURLBiblioTest?token="MAUVAISTOKEN"

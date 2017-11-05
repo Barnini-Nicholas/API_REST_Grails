@@ -88,7 +88,7 @@ class APIController {
                 }
 
                 boolean hasBeenModified = false
-                System.out.println("ALLLLLLLLLLLLLLLLLLLLLLLLLLLLLO : " +  params.nom);
+
                 if (!(params.nom == null || params.nom == "")) {
                     bibli.nom = params.nom
                     hasBeenModified = true
@@ -101,7 +101,7 @@ class APIController {
                     bibli.anneeConstruction = Integer.parseInt(params.anneeConstruction)
                     hasBeenModified = true
                 }
-                System.out.println("ALLLLLLLLLLLLLLLLLLLLLLLLLLLLLO : " +  hasBeenModified);
+
                 if (!hasBeenModified) { // rien modifier
                     render(status: 400, text: "Aucune modification n'a été faites ou il manque des params.") as JSON
                 } else {
